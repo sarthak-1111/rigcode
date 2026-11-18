@@ -36,9 +36,9 @@ dependencies = [
 dev = ["pytest>=8", "ruff>=0.6"]
 
 [project.urls]
-Homepage = "https://github.com/sarthak-111/rigcode"
-Issues = "https://github.com/sarthak-111/rigcode/issues"
-Changelog = "https://github.com/sarthak-111/rigcode/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/sarthak-1111/rigcode"
+Issues = "https://github.com/sarthak-1111/rigcode/issues"
+Changelog = "https://github.com/sarthak-1111/rigcode/blob/main/CHANGELOG.md"
 
 [project.scripts]
 rigcode = "rigcode.cli:main"

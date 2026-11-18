@@ -9,7 +9,7 @@ Open an issue with the output of `rigcode doctor`, the command you ran, and what
 ## Development setup
 
 ```bash
-git clone https://github.com/sarthak-111/rigcode
+git clone https://github.com/sarthak-1111/rigcode
 cd rigcode
 uv venv && uv pip install -e ".[dev]"     # or: python -m venv .venv && pip install -e ".[dev]"
 ```
