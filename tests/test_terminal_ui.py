@@ -86,7 +86,7 @@ def test_permission_dialog_and_tool_block(server, project):
     async def script(ui, rt, inp):
         inp.send_text("make a file\r")
         await wait_for(lambda: ui.dialog is not None)
-        assert "Allow this create file?" in ui.dialog.title
+        assert "Allow creating this file?" in ui.dialog.title
         inp.send_text("1")
         await wait_for(lambda: len(server.requests) == 2 and not ui.busy)
 

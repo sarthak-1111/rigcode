@@ -53,9 +53,10 @@ STYLE = Style.from_dict({
     "spinner": "#d7875f",
     "status": "#d7875f",
     "hint": "#6c6c6c",
-    "dialog.title": "bold #87afd7",
-    "dialog.sel": "bold #87d7ff",
-    "dialog.opt": "",
+    # not "dialog.*": prompt_toolkit's built-in style gives every "dialog" class a blue background
+    "choice.title": "bold #87afd7",
+    "choice.sel": "bold #87d7ff",
+    "choice.opt": "",
     "mode.plan": "#5fafaf",
     "mode.accept": "#af87ff",
     "mode.bypass": "#ff5f5f",
@@ -397,13 +398,13 @@ class TerminalUI(BaseUI):
             frags.extend(self._live(w))
         d = self.dialog
         if d is not None:
-            frags.append(("class:dialog.title", "\n" + d.title + "\n"))
+            frags.append(("class:choice.title", "\n" + d.title + "\n"))
             if d.typing:
                 frags.append(("class:faint", f"  {d.text_label or 'Type your answer'} · Enter to send · Esc to go back\n"))
             else:
                 for i, opt in enumerate(d.options):
                     sel = i == d.index
-                    frags.append(("class:dialog.sel" if sel else "class:dialog.opt",
+                    frags.append(("class:choice.sel" if sel else "class:choice.opt",
                                   f"{'❯' if sel else ' '} {i + 1}. {one_line(opt, w - 6)}\n"))
                 frags.append(("class:faint", "  ↑/↓ and Enter, or press a number · Esc to cancel\n"))
         frags.append(("class:prompt", "  ↳ " if d is not None and d.typing else "> "))
@@ -625,7 +626,7 @@ class TerminalUI(BaseUI):
         if req.kind == "edit" and req.preview and req.preview.get("type") == "new_file":
             title = "Create file"
         who = "" if getattr(agent, "is_main", True) else f"  (requested by the {agent.name} subagent)"
-        frags = [("", "\n"), ("class:dialog.title", f"● {title}"), ("class:dim", who + "\n")]
+        frags = [("", "\n"), ("class:choice.title", f"● {title}"), ("class:dim", who + "\n")]
         target = req.target or req.label
         for line in target.split("\n")[:20]:
             frags.append(("", f"  {line}\n"))
@@ -645,7 +646,11 @@ class TerminalUI(BaseUI):
         elif req.rule_suggestion:
             options.append(f"Yes, and don't ask again for {req.rule_suggestion} in this project")
         options.append("No, and tell rigcode what to do differently")
-        idx, text = await self.dialog_choice(f"Allow this {title.lower()}?", options, text_option=len(options) - 1,
+        questions = {"Bash command": "Allow this bash command?", "Edit file": "Allow this edit?",
+                     "Create file": "Allow creating this file?", "Web access": "Allow this web request?",
+                     "MCP tool": "Allow this MCP tool call?", "Subagent": "Allow this subagent?"}
+        idx, text = await self.dialog_choice(questions.get(title, f"Allow {title}?"), options,
+                                             text_option=len(options) - 1,
                                              text_label="What should rigcode do instead? (empty = just stop)")
         if idx is None:
             return Decision(allow=False, stop=True)
@@ -659,7 +664,7 @@ class TerminalUI(BaseUI):
         return Decision(allow=True, remember_rule=req.rule_suggestion)
 
     async def ask_user(self, question: str, options: list[str]) -> str | None:
-        self.out([("", "\n"), ("class:dialog.title", "? "), ("class:tool.label", question + "\n")])
+        self.out([("", "\n"), ("class:choice.title", "? "), ("class:tool.label", question + "\n")])
         if options:
             opts = list(options) + ["Type something else"]
             idx, text = await self.dialog_choice("Your answer:", opts, text_option=len(opts) - 1)
@@ -674,7 +679,7 @@ class TerminalUI(BaseUI):
         return answer
 
     async def review_plan(self, plan: str):
-        self.out([("", "\n"), ("class:dialog.title", "● Plan ready for review\n")])
+        self.out([("", "\n"), ("class:choice.title", "● Plan ready for review\n")])
         self.out_markdown(plan)
         opts = ["Yes, and auto-accept edits", "Yes, and manually approve edits", "No, keep planning"]
         idx, text = await self.dialog_choice("Would you like to proceed?", opts, text_option=2,

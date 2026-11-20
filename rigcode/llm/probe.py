@@ -191,6 +191,18 @@ LOCAL_SERVERS = (
 )
 
 
+async def _port_open(url: str, timeout: float = 0.5) -> bool:
+    """Quick TCP connect. A listening local port accepts at once, but on Windows a refused
+    localhost connection takes about 2 s to fail, so closed ports are cut off by the timeout."""
+    u = httpx.URL(url)
+    try:
+        _, writer = await asyncio.wait_for(asyncio.open_connection(u.host, u.port), timeout)
+    except (OSError, asyncio.TimeoutError):
+        return False
+    writer.close()
+    return True
+
+
 async def discover(provider: dict, timeout: float = 8.0) -> tuple[ServerInfo, str | None]:
     """Probe the configured server, or find a local one when base_url is 'auto', and pick the model
     when model is 'auto'. Fills in provider['base_url'] / provider['model'] in place.
@@ -199,9 +211,11 @@ async def discover(provider: dict, timeout: float = 8.0) -> tuple[ServerInfo, st
     key = provider.get("api_key")
     notice = None
     if provider.get("base_url") in AUTO:
-        infos = await asyncio.gather(*(probe_server(url, key, timeout=2.0) for _, url in LOCAL_SERVERS))
+        is_open = await asyncio.gather(*(_port_open(url) for _, url in LOCAL_SERVERS))
+        listening = [s for s, ok in zip(LOCAL_SERVERS, is_open) if ok]
+        infos = await asyncio.gather(*(probe_server(url, key, timeout=2.0) for _, url in listening))
         # A server counts only if it lists models: dev web servers often sit on 8000/8080 too.
-        found = [(name, url, i) for (name, url), i in zip(LOCAL_SERVERS, infos) if i.reachable and i.models]
+        found = [(name, url, i) for (name, url), i in zip(listening, infos) if i.reachable and i.models]
         if not found:
             ports = ", ".join(f"{url.split(':')[2].split('/')[0]} ({name})" for name, url in LOCAL_SERVERS)
             return ServerInfo(error=f"no local model server found on ports {ports}. Start one, or point "

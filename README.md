@@ -6,7 +6,10 @@ rigcode reads your code, edits files, runs commands and tests, and delegates to 
 
 It is built for the case other agents handle badly: **a big model on modest hardware**. When your server reads prompts at 30 tokens a second, re-reading a 4,000-token conversation costs two minutes, and most agents re-read it on every turn. rigcode is designed around how llama.cpp's prompt cache actually works, so each step re-reads only the new tokens.
 
-<!-- Demo GIF goes here: docs/demo.gif -->
+<p align="center">
+  <img src="docs/demo.gif" width="857" alt="rigcode finds a local Ollama server, runs the failing tests, reads cart.py, fixes subtotal() after asking to edit, and re-runs the tests until all three pass">
+</p>
+<p align="center"><sub>Real time, not sped up: gpt-oss:120b on Ollama, on a workstation with four RTX A6000s. rigcode asks before it runs a command or edits a file.</sub></p>
 
 ```bash
 pipx install rigcode          # or: uv tool install rigcode

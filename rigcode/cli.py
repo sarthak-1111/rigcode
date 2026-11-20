@@ -22,7 +22,8 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="rigcode",
         description="A terminal coding agent for self-hosted models behind an OpenAI-compatible API.",
-        epilog="Subcommands: rigcode doctor [--quick] · rigcode config [get|set ...] · rigcode sessions")
+        epilog="Subcommands: rigcode doctor [--quick] [-m MODEL] [--base-url URL] · rigcode config [get|set ...] · "
+               "rigcode sessions")
     p.add_argument("prompt", nargs="*", help="initial prompt (interactive) or the task to run (-p)")
     p.add_argument("-p", "--print", action="store_true", dest="print_mode",
                    help="run one task non-interactively and print the result (stdin is appended to the prompt)")
@@ -155,10 +156,22 @@ async def _run_print(settings, project_root: Path, cwd: Path, prompt: str, args,
 
 def _cmd_doctor(argv: list[str]) -> int:
     from rigcode.doctor import run_doctor
-    cwd = Path.cwd()
-    root = _project(cwd)
-    settings = load_settings(root)
-    ok = asyncio.run(run_doctor(settings, root, _console_out(), chat_test="--quick" not in argv))
+    p = argparse.ArgumentParser(prog="rigcode doctor", description="Diagnose the model server connection and local setup.")
+    p.add_argument("--quick", action="store_true", help="skip the chat test")
+    p.add_argument("-m", "--model", help="model name, or the name of a profile from settings")
+    p.add_argument("--base-url", help="OpenAI-compatible base URL (default: find a local server)")
+    p.add_argument("--api-key", help="API key")
+    args = p.parse_args(argv)
+    root = _project(Path.cwd())
+    overrides: dict = {}
+    if args.base_url:
+        overrides["provider.base_url"] = args.base_url
+    if args.api_key:
+        overrides["provider.api_key"] = args.api_key
+    settings = load_settings(root, overrides)
+    if args.model and not settings.apply_profile(args.model):
+        settings.set("provider.model", args.model)
+    ok = asyncio.run(run_doctor(settings, root, _console_out(), chat_test=not args.quick))
     return 0 if ok else 1
 
 

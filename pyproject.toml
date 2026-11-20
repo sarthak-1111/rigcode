@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "rigcode"
-version = "0.1.0"
+version = "0.1.1"
 description = "A terminal coding agent for models you run yourself: llama.cpp, Ollama, LM Studio, vLLM. Built to stay fast on slow hardware."
 readme = "README.md"
 license = "MIT"

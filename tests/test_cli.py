@@ -59,6 +59,14 @@ def test_doctor_against_mock(server, project, isolated_home):
     assert "llama.cpp" in proc.stdout
 
 
+def test_doctor_takes_server_flags(server, project, isolated_home):
+    proc = rigcode(["doctor", "--quick", "--base-url", server.base_url, "-m", "mock-model"], project, isolated_home)
+    assert proc.returncode == 0, proc.stdout
+    assert f"Model server: {server.base_url}" in proc.stdout and "✓ models: mock-model" in proc.stdout
+    proc = rigcode(["doctor", "--model-typo", "x"], project, isolated_home)
+    assert proc.returncode == 2 and "unrecognized arguments" in proc.stderr
+
+
 def test_sessions_and_config_subcommands(project, isolated_home):
     proc = rigcode(["config", "set", "provider.reasoning_effort", "high"], project, isolated_home)
     assert proc.returncode == 0, proc.stderr

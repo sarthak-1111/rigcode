@@ -35,6 +35,11 @@ def test_auto_url_finds_the_first_local_server(server, monkeypatch):
     assert notice == f"Found mock at {server.base_url}, using model mock-model"
 
 
+def test_port_check(server):
+    assert asyncio.run(probe._port_open(server.base_url))
+    assert not asyncio.run(probe._port_open(_dead_url()))
+
+
 def test_auto_url_without_any_server(monkeypatch):
     monkeypatch.setattr(probe, "LOCAL_SERVERS", (("dead", _dead_url()),))
     provider = {"base_url": "auto", "model": "auto"}
