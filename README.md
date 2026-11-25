@@ -1,13 +1,18 @@
-# rigcode
+<h1 align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/sarthak-1111/rigcode/main/docs/logo-dark.svg">
+    <img src="https://raw.githubusercontent.com/sarthak-1111/rigcode/main/docs/logo-light.svg" alt="rigcode" height="72">
+  </picture>
+</h1>
 
-**A terminal coding agent for the model on your own rig.**
+<p align="center"><b>A terminal coding agent for the model on your own rig.</b></p>
 
 rigcode reads your code, edits files, runs commands and tests, and delegates to subagents, the way commercial coding agents do. The model it uses runs on your hardware: llama.cpp, Ollama, LM Studio, vLLM, SGLang, or any OpenAI-compatible server. Your code never leaves your machines, and rigcode has no telemetry.
 
 It is built for the case other agents handle badly: **a big model on modest hardware**. When your server reads prompts at 30 tokens a second, re-reading a 4,000-token conversation costs two minutes, and most agents re-read it on every turn. rigcode is designed around how llama.cpp's prompt cache actually works, so each step re-reads only the new tokens.
 
 <p align="center">
-  <img src="docs/demo.gif" width="857" alt="rigcode finds a local Ollama server, runs the failing tests, reads cart.py, fixes subtotal() after asking to edit, and re-runs the tests until all three pass">
+  <img src="https://raw.githubusercontent.com/sarthak-1111/rigcode/main/docs/demo.gif" width="857" alt="rigcode finds a local Ollama server, runs the failing tests, reads cart.py, fixes subtotal() after asking to edit, and re-runs the tests until all three pass">
 </p>
 <p align="center"><sub>Real time, not sped up: gpt-oss:120b on Ollama, on a workstation with four RTX A6000s. rigcode asks before it runs a command or edits a file.</sub></p>
 
@@ -35,7 +40,7 @@ Both agents used the same model and server: Kimi K3 (2.78T parameters) on llama.
 | Issues resolved, clean runs | **4 / 6** | **4 / 5** |
 | Runs excluded | 0 | 1 (read a later Django release that contains the fix) |
 
-On six tasks that's a tie, not a win for either. In an earlier test on five small tasks at low effort, both solved all five, and rigcode took 30% less time (41 vs 59 min) and generated 34% fewer tokens. [Method, per-task results and caveats](docs/benchmarks.md).
+On six tasks that's a tie, not a win for either. In an earlier test on five small tasks at low effort, both solved all five, and rigcode took 30% less time (41 vs 59 min) and generated 34% fewer tokens. [Method, per-task results and caveats](https://github.com/sarthak-1111/rigcode/blob/main/docs/benchmarks.md).
 
 ## Quick start
 
@@ -167,8 +172,8 @@ Switch profiles with `rigcode -m deep` or `/model gpu-box`. `tool_mode: auto` us
 
 ## Contributing
 
-Bug reports with `rigcode doctor` output are the most useful thing you can send. See [CONTRIBUTING.md](CONTRIBUTING.md) for the development setup.
+Bug reports with `rigcode doctor` output are the most useful thing you can send. See [CONTRIBUTING.md](https://github.com/sarthak-1111/rigcode/blob/main/CONTRIBUTING.md) for the development setup.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/sarthak-1111/rigcode/blob/main/LICENSE)
